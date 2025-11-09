@@ -1,0 +1,46 @@
+
+create table borrower2(Roll_no number,name varchar2(20),date_of_issue date,name_book varchar2(20),status char);
+create table fine2(Roll_no number,fine_date date,fine_amt number);
+set serveroutput on;
+DECLARE
+v_roll borrower2.Roll_no%TYPE :=&Rollno;
+v_name borrower2.name_book%TYPE :='&Bookname';
+doi Date;
+v_days number;
+v_fine number :=0;
+BEGIN
+SELECT date_of_issue into doi from borrower2 where name_book = v_name and Roll_no = v_roll and status ='I';
+v_days := TRUNC(SYSDATE- doi);
+
+if v_days between 15 and 30 then
+v_fine := v_days*5;
+elsif v_days > 30 then
+v_fine := (30*5)+ (v_days-30)*50;
+else
+v_fine := 0;
+
+end if;
+update borrower2 set status='r' where name_book = v_name and Roll_no = v_roll;
+
+if v_fine >0 then
+insert into fine2 values(v_roll,SYSDATE,v_fine);
+dbms_output.put_line('fine is : '||v_fine||'for'||v_days);
+else 
+dbms_output.put_line('no fine');
+end if;
+
+exception
+when no_data_found then
+dbms_output.put_line('record doesnt exist');
+when others then
+dbms_output.put_line('error : '||sqlerrm);
+end;
+/
+INSERT INTO borrower2 VALUES (101, 'Riya', DATE '2025-09-15', 'DBMS', 'I');
+INSERT INTO borrower2 VALUES (102, 'Amit', DATE '2025-09-20', 'C Programming', 'I');
+COMMIT;
+
+-- View tables
+SELECT * FROM borrower2;
+SELECT * FROM fine2;
+
