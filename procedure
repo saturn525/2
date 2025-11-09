@@ -39,3 +39,39 @@ begin
 proc_grade;
 end;
 select* from result2;
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION func_grade(mrk NUMBER)
+RETURN VARCHAR2
+IS
+  grade VARCHAR2(25);
+BEGIN
+  IF mrk BETWEEN 990 AND 1500 THEN
+    grade := 'DISTINCTION';
+  ELSIF mrk BETWEEN 900 AND 989 THEN
+    grade := 'FIRST CLASS';
+  ELSIF mrk BETWEEN 825 AND 899 THEN
+    grade := 'HIGHER SECOND CLASS';
+  ELSE
+    grade := 'FAIL';
+  END IF;
+
+  RETURN grade;
+END;
+/
+
+-- Example usage inside a PL/SQL block
+DECLARE
+  v_grade VARCHAR2(25);
+BEGIN
+  v_grade := func_grade(940);
+  DBMS_OUTPUT.PUT_LINE('Student Grade: ' || v_grade);
+END;
+/
