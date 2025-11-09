@@ -1,0 +1,49 @@
+CREATE TABLE Old_RollCall (
+  RollNo NUMBER PRIMARY KEY,
+  StudentName VARCHAR2(30)
+);
+
+CREATE TABLE New_RollCall (
+  RollNo NUMBER,
+  StudentName VARCHAR2(30)
+);
+-- Old Roll Call (existing students)
+INSERT INTO Old_RollCall VALUES (101, 'Riya');
+INSERT INTO Old_RollCall VALUES (102, 'Amit');
+
+-- New Roll Call (new students, may have duplicates)
+INSERT INTO New_RollCall VALUES (102, 'Amit');   -- duplicate
+INSERT INTO New_RollCall VALUES (103, 'Sneha');
+INSERT INTO New_RollCall VALUES (104, 'Rohan');
+
+COMMIT;
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+  -- Parameterized cursor to fetch a specific RollNo from New_RollCall
+  CURSOR c_new(p_roll NUMBER) IS
+    SELECT RollNo, StudentName FROM New_RollCall WHERE RollNo = p_roll;
+
+  v_roll  New_RollCall.RollNo%TYPE;
+  v_name  New_RollCall.StudentName%TYPE;
+
+BEGIN
+  -- Loop through all rows in New_RollCall
+  FOR rec IN (SELECT RollNo FROM New_RollCall) LOOP
+    OPEN c_new(rec.RollNo);
+    FETCH c_new INTO v_roll, v_name;
+    CLOSE c_new;
+
+    BEGIN
+      INSERT INTO Old_RollCall (RollNo, StudentName) VALUES (v_roll, v_name);
+      DBMS_OUTPUT.PUT_LINE('Inserted Roll No: ' || v_roll || ', Name: ' || v_name);
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        DBMS_OUTPUT.PUT_LINE('Roll No: ' || v_roll || ' already exists — skipped.');
+    END;
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE('Merge Completed.');
+END;
+/
