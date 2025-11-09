@@ -1,0 +1,13 @@
+CREATE OR REPLACE TRIGGER TRIGGER1
+AFTER UPDATE OR DELETE ON Library
+FOR EACH ROW
+BEGIN
+  IF UPDATING THEN
+    INSERT INTO Library_Audit (BookID, Title, Action_Type)
+    VALUES (:OLD.BookID, :OLD.Title, 'UPDATE');
+  ELSIF DELETING THEN
+    INSERT INTO Library_Audit (BookID, Title, Action_Type)
+    VALUES (:OLD.BookID, :OLD.Title, 'DELETE');
+  END IF;
+END;
+/
