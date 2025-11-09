@@ -11,3 +11,23 @@ BEGIN
   END IF;
 END;
 /
+
+CREATE TABLE Library (
+    BookID NUMBER PRIMARY KEY,
+    Title VARCHAR2(50),
+    Author VARCHAR2(50)
+);
+
+CREATE TABLE Library_Audit (
+    BookID NUMBER,
+    Title VARCHAR2(50),
+    Author VARCHAR2(50),
+    Action_Type VARCHAR2(10),
+    Action_Date DATE DEFAULT SYSDATE
+);
+
+INSERT INTO Library VALUES (1, 'DBMS Concepts', 'Ramakrishnan');
+INSERT INTO Library VALUES (2, 'C Programming', 'Dennis Ritchie');
+INSERT INTO Library VALUES (3, 'Java Fundamentals', 'Herbert Schildt');
+
+COMMIT;
