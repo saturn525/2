@@ -1,0 +1,41 @@
+create table stud_mark(Rollno int,name varchar2(20),marks int);
+create table result2(Rollno int, name varchar2(20),class varchar2(20));
+
+create or replace procedure proc_grade as
+cursor c1 is
+select Rollno, name, marks from stud_mark;
+
+rno int;
+mrks int;
+nm varchar(20);
+BEGIN
+open c1;
+loop
+fetch c1 into rno,nm,mrks;
+EXIT WHEN C1%NOTFOUND;
+
+IF mrks between 990 and 1500 then
+insert into result2 values(rno,nm,'distinction');
+ELSIF mrks between 900 and 989 then
+insert into result2 values(rno,nm,'FIRST CLASS');
+ELSIF mrks between 825 and 899 then
+insert into result2 values(rno,nm,'HIGHER SECOND CLASS');
+ELSE
+insert into result2 values(rno,nm,'FAIL');
+END IF;
+END loop;
+CLOSE c1;
+dbms_output.put_line('records updated successfully');
+end;
+/
+INSERT INTO stud_mark VALUES (1, 'Riya', 1450);
+INSERT INTO stud_mark VALUES (2, 'Amit', 940);
+INSERT INTO stud_mark VALUES (3, 'Sneha', 880);
+INSERT INTO stud_mark VALUES (4, 'Rohan', 800);
+COMMIT;
+SET SERVEROUTPUT ON;
+
+begin
+proc_grade;
+end;
+select* from result2;
